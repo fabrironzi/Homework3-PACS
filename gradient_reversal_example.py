@@ -58,10 +58,10 @@ class DANN(nn.Module):
         if alpha is not None:
             # gradient reversal layer (backward gradients will be reversed)
             reverse_feature = ReverseLayerF.apply(features, alpha)
-            discriminator_output = ...
+            discriminator_output = self.domain_classifier(reverse_feature)
             return discriminator_output
         # If we don't pass alpha, we assume we are training with supervision
         else:
             # do something else
-            class_outputs = ...
+            class_outputs = self.class_classifier(features)
             return class_outputs
