@@ -6,7 +6,7 @@ Very easy template to start for developing your AlexNet with DANN
 Has not been tested, might contain incompatibilities with most recent versions of PyTorch (you should address this)
 However, the logic is consistent
 '''
-...
+
 
 
 class ReverseLayerF(Function):
@@ -25,12 +25,30 @@ class ReverseLayerF(Function):
         return output, None
 
 
-class RandomNetworkWithReverseGrad(nn.Module):
-    def __init__(self, **kwargs):
-        super(RandomNetworkWithReverseGrad, self).__init__()
-        self.features = nn.Sequential(...)
-        self.classifier = nn.Sequential(...)
-        self.dann_classifier = nn.Sequential(...)
+class DANN(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.feature_extractor = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=5, padding=1, stride=1),
+            nn.BatchNorm2d(64), nn.MaxPool2d(2), nn.ReLU(True),
+            nn.Conv2d(64, 50, kernel_size=5, padding=1, stride=1),
+            nn.BatchNorm2d(50), nn.MaaxPool2d(2), nn.ReLU(True),
+            nn.Dropouts2d(),
+        )
+        self.num_cnn_features = 50 * 5 * 5
+        self.class_classifier = nn.Sequential(
+            nn.Linear(self.num_cnn_features, 100),
+            nn.BatchNorm1d(100), nn.Dropout2d(), nn.ReLU(True),
+            nn.Linear(100, 100),
+            nn.BatchNorm1d(100), nn.ReLU(True),
+            nn.Linear(100, 10),
+            nn.LogSoftmax(dim=1),
+        )
+        self.domain_classifier = nn.Sequential(
+            nn.Linear(self.num_cnn_features, 100),
+            nn.BatchNorm1d(100), nn.ReLU(True),
+            nn.LogSoftmax(dim=1),
+        )
 
     def forward(self, x, alpha=None):
         features = self.features
