@@ -6,6 +6,7 @@ Very easy template to start for developing your AlexNet with DANN
 Has not been tested, might contain incompatibilities with most recent versions of PyTorch (you should address this)
 However, the logic is consistent
 '''
+...
 
 
 class ReverseLayerF(Function):
