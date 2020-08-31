@@ -1,5 +1,6 @@
+import torch
 import torch.nn as nn
-from torch.autograd import Function
+from .utils import load_state_dict_from_url
 
 ''' 
 Very easy template to start for developing your AlexNet with DANN 
@@ -7,6 +8,12 @@ Has not been tested, might contain incompatibilities with most recent versions o
 However, the logic is consistent
 '''
 
+__all__ = ['AlexNet', 'alexnet']
+
+
+model_urls = {
+    'alexnet': 'https://download.pytorch.org/models/alexnet-owt-4df8aa71.pth',
+}
 
 
 class ReverseLayerF(Function):
@@ -27,7 +34,7 @@ class ReverseLayerF(Function):
 
 class DANN(nn.Module):
     def __init__(self):
-        super().__init__()
+        super(AlexNet, self).__init__()
         self.feature_extractor = nn.Sequential(
             nn.Conv2d(3, 64, kernel_size=5, padding=1, stride=1),
             nn.BatchNorm2d(64), nn.MaxPool2d(2), nn.ReLU(True),
@@ -65,3 +72,18 @@ class DANN(nn.Module):
             # do something else
             class_outputs = self.class_classifier(features)
             return class_outputs
+
+        
+def alexnet(pretrained=False, progress=True, **kwargs):
+    r"""AlexNet model architecture from the
+    `"One weird trick..." <https://arxiv.org/abs/1404.5997>`_ paper.
+    Args:
+        pretrained (bool): If True, returns a model pre-trained on ImageNet
+        progress (bool): If True, displays a progress bar of the download to stderr
+    """
+    model = AlexNet(**kwargs)
+    if pretrained:
+        state_dict = load_state_dict_from_url(model_urls['alexnet'],
+                                              progress=progress)
+        model.load_state_dict(state_dict)
+    return model
