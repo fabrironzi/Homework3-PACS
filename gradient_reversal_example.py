@@ -45,7 +45,7 @@ class DANN(nn.Module):
             nn.BatchNorm2d(64), nn.MaxPool2d(2), nn.ReLU(True),
             nn.Conv2d(64, 50, kernel_size=5, padding=1, stride=1),
             nn.BatchNorm2d(50), nn.MaxPool2d(2), nn.ReLU(True),
-            nn.Dropouts2d(),
+            nn.Dropout2d(),
         )
         self.num_cnn_features = 50 * 5 * 5
         self.class_classifier = nn.Sequential(
