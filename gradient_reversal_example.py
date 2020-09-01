@@ -76,9 +76,9 @@ class DANN(nn.Module):
         else:
             # do something else
             class_outputs = self.class_classifier(features)
-            return class_outputsFF
+            return class_outputs
                 
-def alexnet(pretrained=False, progress=True, **kwargs):
+def myalexnet(pretrained=False, progress=True, **kwargs):
     r"""AlexNet model architecture from the
     `"One weird trick..." <https://arxiv.org/abs/1404.5997>`_ paper.
     Args:
@@ -90,6 +90,8 @@ def alexnet(pretrained=False, progress=True, **kwargs):
         state_dict = load_state_dict_from_url(model_urls['alexnet'],
                                               progress=progress)
         model.load_state_dict(state_dict, strict=False)
+        state_dict.popitem("classifier.6.bias")
+        state_dict.popitem("classifier.6.weight") 
         # model.domain_classifier[1].weight.data =  model.class_classifier[1].weight.data
         # model.domain_classifier[1].bias.data = model.class_classifier[1].bias.data
         
