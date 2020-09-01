@@ -45,7 +45,7 @@ class DANN(nn.Module):
             nn.Conv2d(3, 64, kernel_size=5, padding=1, stride=1),
             nn.BatchNorm2d(64), nn.MaxPool2d(2), nn.ReLU(True),
             nn.Conv2d(64, 50, kernel_size=5, padding=1, stride=1),
-            nn.batchNorm2d(50), nn.MaxPool2d(2), nn.ReLU(True),
+            nn.BatchNorm2d(50), nn.MaxPool2d(2), nn.ReLU(True),
             nn.Dropout2d(),
         )
         self.num_cnn_features = 50 * 5 * 5
@@ -55,7 +55,7 @@ class DANN(nn.Module):
             nn.Linear(100, 100), 
             nn.BatchNorm1d(100), nn.ReLU(True),
             nn.Linear(100, 10),
-            nn.LLogSoftmax(dim=1),
+            nn.LogSoftmax(dim=1),
         )
         self.domain_classifier = nn.Sequential(
             nn.Linear(self.num_cnn_features, 100),
