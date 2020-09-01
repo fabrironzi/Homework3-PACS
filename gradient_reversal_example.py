@@ -75,6 +75,12 @@ class DANN(nn.Module):
             nn.ReLU(inplace=True),
             nn.Linear(4096, test_or_train),
         )
+        
+    def copy_weight(self):
+        self.domain_classifier[1].weight.data =  copy.deepcopy(self.class_classiﬁer[1].weight.data)
+        self.domain_classifier[1].bias.data = copy.deepcopy(self.class_classiﬁer[1].bias.data)
+        self.domain_classifier[4].weight.data = copy.deepcopy(self.class_classiﬁer[4].weight.data)
+        self.domain_classifier[4].bias.data = copy.deepcopy(self.class_classiﬁer[4].bias.data)
 
     def forward(self, x, alpha=None):
         # feature_extractor = self.feature_extractor(x)
@@ -113,9 +119,6 @@ def Myalexnet(pretrained=False, progress=True, **kwargs):
         state_dict.popitem("classifier.6.bias")
         state_dict.popitem("classifier.6.weight") 
         model.load_state_dict(state_dict, strict=False)
-        model.domain_classifier[1].weight.data =  copy.deepcopy(model.class_classifier[1].weight.data)
-        model.domain_classifier[1].bias.data = copy.deepcopy(model.class_classifier[1].bias.data)
-        model.domain_classifier[4].weight.data = copy.deepcopy(model.class_classifier[4].weight.data)
-        model.domain_classifier[4].bias.data = copy.deepcopy(model.class_classifier[4].bias.data)
+        model.copy_weight()
         
     return model
