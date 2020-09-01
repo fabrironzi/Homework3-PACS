@@ -106,5 +106,7 @@ def Myalexnet(pretrained=False, progress=True, **kwargs):
         model.load_state_dict(state_dict, strict=False)
         model.domain_classifier[1].weight.data =  model.class_classifier[1].weight.data
         model.domain_classifier[1].bias.data = model.class_classifier[1].bias.data
+        model.domain_classifier[4].weight.data = model.class_classifier[4].weight.data
+        model.domain_classifier[4].bias.data = model.class_classifier[4].bias.data
         
     return model
