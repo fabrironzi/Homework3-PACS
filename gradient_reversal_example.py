@@ -41,29 +41,43 @@ class DANN(nn.Module):
     def __init__(self):
         super(DANN, self).__init__()
         self.feature_extractor = nn.Sequential(
-            nn.Conv2d(3, 64, kernel_size=5, padding=1, stride=1),
-            nn.BatchNorm2d(64), nn.MaxPool2d(2), nn.ReLU(True),
-            nn.Conv2d(64, 50, kernel_size=5, padding=1, stride=1),
-            nn.BatchNorm2d(50), nn.MaxPool2d(2), nn.ReLU(True),
-            nn.Dropout2d(),
+            nn.Conv2d(3, 64, kernel_size=11, stride=4, padding=2),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2),
+            nn.Conv2d(64, 192, kernel_size=5, padding=2),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2),
+            nn.Conv2d(192, 384, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(384, 256, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(256, 256, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2),
         )
-        self.num_cnn_features = 50 * 5 * 5
+        self.avgpool = nn.AdaptiveAvgPool2d((6, 6))
         self.class_classifier = nn.Sequential(
-            nn.Linear(self.num_cnn_features, 100),
-            nn.BatchNorm1d(100), nn.Dropout2d(), nn.ReLU(True),
-            nn.Linear(100, 100),
-            nn.BatchNorm1d(100), nn.ReLU(True),
-            nn.Linear(100, 10),
-            nn.LogSoftmax(dim=1),
+            nn.Dropout(),
+            nn.Linear(256 * 6 * 6, 4096),
+            nn.ReLU(inplace=True),
+            nn.Dropout(),
+            nn.Linear(4096, 4096),
+            nn.ReLU(inplace=True),
+            nn.Linear(4096, num_category),
         )
         self.domain_classifier = nn.Sequential(
-            nn.Linear(self.num_cnn_features, 100),
-            nn.BatchNorm1d(100), nn.ReLU(True),
-            nn.LogSoftmax(dim=1),
+            nn.Dropout(),
+            nn.Linear(256 * 6 * 6, 4096),
+            nn.ReLU(inplace=True),
+            nn.Dropout(),
+            nn.Linear(4096, 4096),
+            nn.ReLU(inplace=True),
+            nn.Linear(4096, test_or_train),
         )
 
     def forward(self, x, alpha=None):
         feature_extractor = self.feature_extractor(x)
+        feature_extractor = self.avgpool(x)
         # Flatten the features:
         feature_extractor = feature_extractor.view(feature_extractor.size(0), -1)
         # If we pass alpha, we can assume we are training the discriminator
