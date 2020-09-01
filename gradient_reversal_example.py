@@ -1,6 +1,9 @@
 import torch
 import torch.nn as nn
-from .utils import load_state_dict_from_url
+try:
+    from torch.hub import load_state_dict_from_url
+except ImportError:
+    from torch.utils.model_zoo import load_url as load_state_dict_from_url
 
 ''' 
 Very easy template to start for developing your AlexNet with DANN 
@@ -72,7 +75,12 @@ class DANN(nn.Module):
             # do something else
             class_outputs = self.class_classifier(features)
             return class_outputs
-
+    
+    def copy_weights(self):
+        self.domain_classifier[1].weight.data =  self.class_classifier[1].weight.data
+        self.domain_classifier[1].bias.data = self.class_classifier[1].bias.data
+        
+        model.branches[1].weight.copy_(model.branches[0].weight)
         
 def alexnet(pretrained=False, progress=True, **kwargs):
     r"""AlexNet model architecture from the
@@ -85,5 +93,5 @@ def alexnet(pretrained=False, progress=True, **kwargs):
     if pretrained:
         state_dict = load_state_dict_from_url(model_urls['alexnet'],
                                               progress=progress)
-        model.load_state_dict(state_dict)
+        model.load_state_dict(state_dict, strict=false)
     return model
