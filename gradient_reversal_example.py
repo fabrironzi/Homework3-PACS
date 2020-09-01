@@ -78,8 +78,10 @@ class DANN(nn.Module):
     def forward(self, x, alpha=None):
         feature_extractor = self.feature_extractor(x)
         feature_extractor = self.avgpool(x)
+        
         # Flatten the features:
-        feature_extractor = feature_extractor.view(feature_extractor.size(0), -1)
+        # feature_extractor = feature_extractor.view(feature_extractor.size(0), -1)
+        feature_extractor = torch.flatten(x, 1)
         # If we pass alpha, we can assume we are training the discriminator
         if alpha is not None:
             # gradient reversal layer (backward gradients will be reversed)
@@ -103,6 +105,8 @@ def Myalexnet(pretrained=False, progress=True, **kwargs):
     if pretrained:
         state_dict = load_state_dict_from_url(model_urls['alexnet'],
                                               progress=progress)
+        state_dict.popitem("classifier.6.bias")
+        state_dict.popitem("classifier.6.weight") 
         model.load_state_dict(state_dict, strict=False)
         model.domain_classifier[1].weight.data =  model.class_classifier[1].weight.data
         model.domain_classifier[1].bias.data = model.class_classifier[1].bias.data
