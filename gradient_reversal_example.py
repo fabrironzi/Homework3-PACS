@@ -20,6 +20,8 @@ model_urls = {
     'alexnet': 'https://download.pytorch.org/models/alexnet-owt-4df8aa71.pth',
 }
 
+class CustomClass:
+    return None
 
 class ReverseLayerF(Function):
     # Forwards identity
