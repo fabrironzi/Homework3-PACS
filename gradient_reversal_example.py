@@ -81,9 +81,7 @@ class DANN(nn.Module):
     def copy_weights(self):
         self.domain_classifier[1].weight.data =  self.class_classifier[1].weight.data
         self.domain_classifier[1].bias.data = self.class_classifier[1].bias.data
-        
-        model.branches[1].weight.copy_(model.branches[0].weight)
-        
+                
 def alexnet(pretrained=False, progress=True, **kwargs):
     r"""AlexNet model architecture from the
     `"One weird trick..." <https://arxiv.org/abs/1404.5997>`_ paper.
@@ -91,7 +89,7 @@ def alexnet(pretrained=False, progress=True, **kwargs):
         pretrained (bool): If True, returns a model pre-trained on ImageNet
         progress (bool): If True, displays a progress bar of the download to stderr
     """
-    model = AlexNet(**kwargs)
+    model = DANN(**kwargs)
     if pretrained:
         state_dict = load_state_dict_from_url(model_urls['alexnet'],
                                               progress=progress)
