@@ -39,7 +39,7 @@ class ReverseLayerF(Function):
 
 class DANN(nn.Module):
     def __init__(self):
-        super(AlexNet, self).__init__()
+        super(DANN, self).__init__()
         self.feature_extractor = nn.Sequential(
             nn.Conv2d(3, 64, kernel_size=5, padding=1, stride=1),
             nn.BatchNorm2d(64), nn.MaxPool2d(2), nn.ReLU(True),
@@ -76,11 +76,7 @@ class DANN(nn.Module):
         else:
             # do something else
             class_outputs = self.class_classifier(features)
-            return class_outputs
-    
-    def copy_weights(self):
-        self.domain_classifier[1].weight.data =  self.class_classifier[1].weight.data
-        self.domain_classifier[1].bias.data = self.class_classifier[1].bias.data
+            return class_outputsFF
                 
 def alexnet(pretrained=False, progress=True, **kwargs):
     r"""AlexNet model architecture from the
@@ -93,5 +89,8 @@ def alexnet(pretrained=False, progress=True, **kwargs):
     if pretrained:
         state_dict = load_state_dict_from_url(model_urls['alexnet'],
                                               progress=progress)
-        model.load_state_dict(state_dict, strict=false)
+        model.load_state_dict(state_dict, strict=False)
+        model.domain_classifier[1].weight.data =  model.class_classifier[1].weight.data
+        model.domain_classifier[1].bias.data = model.class_classifier[1].bias.data
+        
     return model
