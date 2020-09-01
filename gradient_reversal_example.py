@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import copy
 from torch.autograd import Function
 
 try:
@@ -108,9 +109,9 @@ def Myalexnet(pretrained=False, progress=True, **kwargs):
         state_dict.popitem("classifier.6.bias")
         state_dict.popitem("classifier.6.weight") 
         model.load_state_dict(state_dict, strict=False)
-        model.domain_classifier[1].weight.data =  model.class_classifier[1].weight.data
-        model.domain_classifier[1].bias.data = model.class_classifier[1].bias.data
-        model.domain_classifier[4].weight.data = model.class_classifier[4].weight.data
-        model.domain_classifier[4].bias.data = model.class_classifier[4].bias.data
+        model.domain_classifier[1].weight.data =  copy.deepcopy(model.class_classifier[1].weight.data)
+        model.domain_classifier[1].bias.data = copy.deepcopy(model.class_classifier[1].bias.data)
+        model.domain_classifier[4].weight.data = copy.deepcopy((model.class_classifier[4].weight.data)
+        model.domain_classifier[4].bias.data = copy.deepcopy(model.class_classifier[4].bias.data)
         
     return model
