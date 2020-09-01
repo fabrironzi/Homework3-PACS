@@ -87,7 +87,7 @@ class DANN(nn.Module):
         # feature_extractor = self.avgpool(x)
         
         x = self.feature_extractor(x)
-        x = self.feature_extractor(x)
+        x = self.avgpool(x)
         feature_extractor = torch.flatten(x, 1)
         
         # Flatten the features:
