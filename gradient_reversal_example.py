@@ -63,7 +63,7 @@ class DANN(nn.Module):
             nn.Dropout(),
             nn.Linear(4096, 4096),
             nn.ReLU(inplace=True),
-            nn.Linear(4096, num_category),
+            nn.Linear(4096, 7),
         )
         self.domain_classifier = nn.Sequential(
             nn.Dropout(),
@@ -72,7 +72,7 @@ class DANN(nn.Module):
             nn.Dropout(),
             nn.Linear(4096, 4096),
             nn.ReLU(inplace=True),
-            nn.Linear(4096, test_or_train),
+            nn.Linear(4096, 2),
         )
 
     def forward(self, x, alpha=None):
