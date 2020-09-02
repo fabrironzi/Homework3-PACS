@@ -33,7 +33,7 @@ class ReverseLayerF(Function):
 class DANN(nn.Module):
     def __init__(self, num_category=7, test_or_train=2):
         super(DANN, self).__init__()
-        self.feature = nn.Sequential(
+        self.features = nn.Sequential(
             nn.Conv2d(3, 64, kernel_size=11, stride=4, padding=2),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=3, stride=2),
@@ -76,7 +76,7 @@ class DANN(nn.Module):
         self.domain_classifier[4].bias.data = copy.deepcopy(self.classiﬁer[4].bias.data)
 
     def forward(self, x, alpha=None):
-        x = self.feature(x)
+        x = self.features(x)
         x = self.avgpool(x)
         features = torch.flatten(x, 1)
 
