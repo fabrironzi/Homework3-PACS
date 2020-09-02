@@ -91,7 +91,7 @@ class DANN(nn.Module):
             return class_outputs
 
 
-def AlexNetDANN(pretrained=False, progress=True, **kwargs):
+def Myalexnet(pretrained=False, progress=True, **kwargs):
     r"""AlexNet model architecture from the
     `"One weird trick..." <https://arxiv.org/abs/1404.5997>`_ paper.
 
