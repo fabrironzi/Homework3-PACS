@@ -49,7 +49,7 @@ class DANN(nn.Module):
             nn.MaxPool2d(kernel_size=3, stride=2),
         )
         self.avgpool = nn.AdaptiveAvgPool2d((6, 6))
-        self.class_classifier = nn.Sequential(
+        self.classifier = nn.Sequential(
             nn.Dropout(),
             nn.Linear(256 * 6 * 6, 4096),
             nn.ReLU(inplace=True),
@@ -70,10 +70,10 @@ class DANN(nn.Module):
         )
 
     def copy_weigth(self):
-        self.domain_classifier[1].weight.data =  copy.deepcopy(self.class_classifier[1].weight.data)
-        self.domain_classifier[1].bias.data = copy.deepcopy(self.class_classifier[1].bias.data)
-        self.domain_classifier[4].weight.data = copy.deepcopy(self.class_classifier[4].weight.data)
-        self.domain_classifier[4].bias.data = copy.deepcopy(self.class_classifier[4].bias.data)
+        self.domain_classifier[1].weight.data =  copy.deepcopy(self.classifier[1].weight.data)
+        self.domain_classifier[1].bias.data = copy.deepcopy(self.classifier[1].bias.data)
+        self.domain_classifier[4].weight.data = copy.deepcopy(self.classifier[4].weight.data)
+        self.domain_classifier[4].bias.data = copy.deepcopy(self.classifier[4].bias.data)
 
     def forward(self, x, alpha=None):
         x = self.feature_extraction(x)
@@ -87,7 +87,7 @@ class DANN(nn.Module):
             discriminator_output = self.domain_classifier(reverse_feature)
             return discriminator_output
         else:
-            class_outputs = self.class_classifier(features)
+            class_outputs = self.classifier(features)
             return class_outputs
 
 
