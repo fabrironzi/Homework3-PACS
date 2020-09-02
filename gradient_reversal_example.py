@@ -33,7 +33,7 @@ class ReverseLayerF(Function):
 class DANN(nn.Module):
     def __init__(self, num_category=7, test_or_train=2):
         super(DANN, self).__init__()
-        self.features = nn.Sequential(
+        self.feature_extractor = nn.Sequential(
             nn.Conv2d(3, 64, kernel_size=11, stride=4, padding=2),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=3, stride=2),
@@ -49,7 +49,7 @@ class DANN(nn.Module):
             nn.MaxPool2d(kernel_size=3, stride=2),
         )
         self.avgpool = nn.AdaptiveAvgPool2d((6, 6))
-        self.classifier = nn.Sequential(
+        self.class_classifier = nn.Sequential(
             nn.Dropout(),
             nn.Linear(256 * 6 * 6, 4096),
             nn.ReLU(inplace=True),
@@ -70,13 +70,13 @@ class DANN(nn.Module):
         )
 
     def copy_weigth(self):
-        self.domain_classifier[1].weight.data =  copy.deepcopy(self.classiﬁer[1].weight.data)
-        self.domain_classifier[1].bias.data = copy.deepcopy(self.classiﬁer[1].bias.data)
-        self.domain_classifier[4].weight.data = copy.deepcopy(self.classiﬁer[4].weight.data)
-        self.domain_classifier[4].bias.data = copy.deepcopy(self.classiﬁer[4].bias.data)
+        self.domain_classifier[1].weight.data =  copy.deepcopy(self.class_classiﬁer[1].weight.data)
+        self.domain_classifier[1].bias.data = copy.deepcopy(self.class_classiﬁer[1].bias.data)
+        self.domain_classifier[4].weight.data = copy.deepcopy(self.class_classiﬁer[4].weight.data)
+        self.domain_classifier[4].bias.data = copy.deepcopy(self.class_classiﬁer[4].bias.data)
 
     def forward(self, x, alpha=None):
-        x = self.features(x)
+        x = self.feature_extractor(x)
         x = self.avgpool(x)
         features = torch.flatten(x, 1)
 
@@ -87,7 +87,7 @@ class DANN(nn.Module):
             discriminator_output = self.domain_classifier(reverse_feature)
             return discriminator_output
         else:
-            class_outputs = self.classifier(features)
+            class_outputs = self.class_classifier(features)
             return class_outputs
 
 
@@ -105,8 +105,8 @@ def Myalexnet(pretrained=False, progress=True, **kwargs):
                                               progress=progress)
         
         # removing unused params
-        state_dict.popitem("classifier.6.bias")
-        state_dict.popitem("classifier.6.weight") 
+        state_dict.popitem("class_classifier.6.bias")
+        state_dict.popitem("class_classifier.6.weight") 
         model.load_state_dict(state_dict,strict=False)
         model.copy_weigth()
 
