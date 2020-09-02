@@ -78,16 +78,16 @@ class DANN(nn.Module):
     def forward(self, x, alpha=None):
         x = self.feature_extractor(x)
         x = self.avgpool(x)
-        features = torch.flatten(x, 1)
+        feature_extractor = torch.flatten(x, 1)
 
         # If we pass alpha, we can assume we are training the discriminator
         if alpha is not None:
             # gradient reversal layer (backward gradients will be reversed)
-            reverse_feature = ReverseLayerF.apply(features,alpha)
+            reverse_feature = ReverseLayerF.apply(feature_extractor,alpha)
             discriminator_output = self.domain_classifier(reverse_feature)
             return discriminator_output
         else:
-            class_outputs = self.classifier(features)
+            class_outputs = self.classifier(feature_extractor)
             return class_outputs
 
 
