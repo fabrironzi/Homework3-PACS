@@ -33,7 +33,7 @@ class ReverseLayerF(Function):
 class DANN(nn.Module):
     def __init__(self, num_category=7, test_or_train=2):
         super(DANN, self).__init__()
-        self.feature_extractor = nn.Sequential(
+        self.features = nn.Sequential(
             nn.Conv2d(3, 64, kernel_size=11, stride=4, padding=2),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=3, stride=2),
@@ -76,18 +76,18 @@ class DANN(nn.Module):
         self.domain_classifier[4].bias.data = copy.deepcopy(self.classifier[4].bias.data)
 
     def forward(self, x, alpha=None):
-        x = self.feature_extractor(x)
+        x = self.features(x)
         x = self.avgpool(x)
-        feature_extractor = torch.flatten(x, 1)
+        features = torch.flatten(x, 1)
 
         # If we pass alpha, we can assume we are training the discriminator
         if alpha is not None:
             # gradient reversal layer (backward gradients will be reversed)
-            reverse_feature = ReverseLayerF.apply(feature_extractor,alpha)
+            reverse_feature = ReverseLayerF.apply(features,alpha)
             discriminator_output = self.domain_classifier(reverse_feature)
             return discriminator_output
         else:
-            class_outputs = self.classifier(feature_extractor)
+            class_outputs = self.classifier(features)
             return class_outputs
 
 
