@@ -31,7 +31,7 @@ class ReverseLayerF(Function):
         return output, None
 
 class DANN(nn.Module):
-    def __init__(self, num_category=7, test_or_train=2):
+    def __init__(self):
         super(DANN, self).__init__()
         self.features = nn.Sequential(
             nn.Conv2d(3, 64, kernel_size=11, stride=4, padding=2),
@@ -56,7 +56,7 @@ class DANN(nn.Module):
             nn.Dropout(),
             nn.Linear(4096, 4096),
             nn.ReLU(inplace=True),
-            nn.Linear(4096, num_category),
+            nn.Linear(4096, 7),
         )
 
         self.domain_classifier = nn.Sequential(
@@ -66,15 +66,9 @@ class DANN(nn.Module):
             nn.Dropout(),
             nn.Linear(4096, 4096),
             nn.ReLU(inplace=True),
-            nn.Linear(4096, test_or_train),
+            nn.Linear(4096, 2),
         )
-
-    def copy_weigth(self):
-        self.domain_classifier[1].weight.data =  copy.deepcopy(self.classifier[1].weight.data)
-        self.domain_classifier[1].bias.data = copy.deepcopy(self.classifier[1].bias.data)
-        self.domain_classifier[4].weight.data = copy.deepcopy(self.classifier[4].weight.data)
-        self.domain_classifier[4].bias.data = copy.deepcopy(self.classifier[4].bias.data)
-
+        
     def forward(self, x, alpha=None):
         x = self.features(x)
         x = self.avgpool(x)
@@ -106,8 +100,12 @@ def Myalexnet(pretrained=False, progress=True, **kwargs):
         
         # removing unused params
         state_dict.popitem("classifier.6.bias")
-        state_dict.popitem("classifier.6.weight") 
+        state_dict.popitem("classifier.6.weight")
+        
         model.load_state_dict(state_dict,strict=False)
-        model.copy_weigth()
+        DANN.domain_classifier[1].weight.data =  copy.deepcopy(DANN.classifier[1].weight.data)
+        DANN.domain_classifier[1].bias.data = copy.deepcopy(DANN.classifier[1].bias.data)
+        DANN.domain_classifier[4].weight.data = copy.deepcopy(DANN.classifier[4].weight.data)
+        DANN.domain_classifier[4].bias.data = copy.deepcopy(DANN.classifier[4].bias.data)
 
     return model
